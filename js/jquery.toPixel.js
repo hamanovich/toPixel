@@ -1,23 +1,25 @@
 (function ($) {
     $.fn.toPixel = function (options) {
         var settings = $.extend({
-            opacity: 0.5,
-            enable: true,
-            imgPath: 'layout.jpg',
-            top: 0,
-            left: '50%',
-            navPosition: 'rightTop'
+            opacity: 0.5,           // layout opacity  (0 <= opacity <= 1)
+            enable: true,           // show/hide layout (true or false)
+            imgPath: 'layout.jpg',  // path to img
+            top: 0,                 // layout top offset
+            left: '50%',            // layout left offset in %
+            navPosition: 'rightTop' //  layout bar position:
+                                    // (leftTop, rightTop, rightBottom, leftBottom)
         }, options);
 
         return this.each(function () {
             if (options) {
                 $.extend(settings, options);
             }
-
             var layout = "<div id='pp-layout'/>",
                 html = $('html'),
                 body = $('body'),
-                layoutImg = '<img alt="" src="pp/' + settings.imgPath + '">';
+                layoutImg = '<img alt="'+settings.imgPath.slice(0,-4)+'" src="pp/' + settings.imgPath + '">',
+                valTop,
+                layoutLeft;
 
             // #pp-nav: creating template
             body.prepend(layout, "<div id='pp-nav'>" +
@@ -30,10 +32,10 @@
                 "<span>layout position:</span>" +
                 "<div><a href='#' id='pp-left'>left++</a>" +
                 "<span>or</span><a href='#' id='pp-right'>left--</a>" +
-                "<input type='text' id='ppinpt-left' value='' placeholder='left pos'></div>" +
+                "<input type='text' id='ppinpt-left' value='0' placeholder='left pos'></div>" +
                 "<div><a href='#' id='pp-top'>top++</a>" +
                 "<span>or</span><a href='#' id='pp-bottom'>top--</a>" +
-                "<input type='text' id='ppinpt-top' value='' placeholder='top pos'></div>" +
+                "<input type='text' id='ppinpt-top' value='0' placeholder='top pos'></div>" +
                 "</div>" +
                 "</div>");
 
@@ -66,18 +68,22 @@
             // #pp-layout insert and make style
             layoutDiv.prepend(layoutImg);
 
+            // apply default css styles
             layoutDiv.css({
                 'margin-left': -layoutDiv.find('img').width() / 2,
                 'opacity': settings.opacity,
+                'left' : settings.left,
+                'top' : settings.top,
                 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + settings.opacity * 100 + ')',
                 'filter': 'alpha(opacity=' + settings.opacity * 100 + ')'
             });
 
+            // prevent default action for all links into layout wrapper
             ppNavWrap.ppNav.find('a').click(function (e) {
                 e.preventDefault();
             });
 
-            if (settings.enable) {
+            if (settings.enable) {   // if layout switch on
 
                 // switch on/off function
                 ppNavWrap.ppToggle.click(function (e) {
@@ -95,12 +101,9 @@
                 // more opacity
                 ppOpacity.ppMore.click(function () {
                     if (parseFloat(settings.opacity.toFixed(1)) < 1) {
-
                         settings.opacity = parseFloat(settings.opacity.toFixed(1)) + 0.1;
-
                         layoutDiv.css({
                             'opacity': settings.opacity,
-
                             'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + settings.opacity * 100 + ')',
                             'filter': 'alpha(opacity=' + settings.opacity * 100 + ')'
                         });
@@ -117,12 +120,9 @@
                 // less opacity
                 ppOpacity.ppLess.click(function () {
                     if (parseFloat(settings.opacity.toFixed(1)) > 0) {
-
                         settings.opacity = parseFloat(settings.opacity.toFixed(1)) - 0.1;
-
                         layoutDiv.css({
                             'opacity': settings.opacity,
-
                             'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + settings.opacity * 100 + ')',
                             'filter': 'alpha(opacity=' + settings.opacity * 100 + ')'
                         });
@@ -137,25 +137,53 @@
                 });
 
                 // top++ position
+                ppInpt.ppinptTop.val(parseInt(layoutDiv.css('top'))+"px");
+
                 ppOffset.ppTop.click(function () {
-                    layoutDiv.css('top', settings.top += 1);
+                    valTop =  parseInt(ppInpt.ppinptTop.val());
+                    valTop += 1;
+                    layoutDiv.css('top', valTop);
+                    ppInpt.ppinptTop.val(valTop+"px");
+                });
+
+                // top blur input
+                ppInpt.ppinptTop.blur(function(){
+                    valTop =  parseInt(ppInpt.ppinptTop.val());
+                    layoutDiv.css('top', valTop);
+                    ppInpt.ppinptTop.val(valTop+"px")
                 });
 
                 // top-- position
                 ppOffset.ppBottom.click(function () {
-                    layoutDiv.css('top', settings.top -= 1);
+                    valTop =  parseInt(ppInpt.ppinptTop.val());
+                    valTop -= 1;
+                    layoutDiv.css('top', valTop);
+                    ppInpt.ppinptTop.val(valTop+"px");
                 });
 
                 // left++ position
+                ppInpt.ppinptLeft.val(parseInt(layoutDiv.css('margin-left'))+"px");
+
                 ppOffset.ppLeft.click(function () {
-                    var layoutLeft = parseInt(layoutDiv.css('margin-left'));
-                    layoutDiv.css('margin-left', layoutLeft += 1);
+                    layoutLeft = parseInt(layoutDiv.css('margin-left'));
+                    layoutLeft += 1;
+                    layoutDiv.css('margin-left', layoutLeft);
+                    ppInpt.ppinptLeft.val(parseInt(layoutLeft)+"px");
+                });
+
+                // ppLeft blur input
+                ppInpt.ppinptLeft.blur(function(){
+                    layoutLeft =  parseInt(ppInpt.ppinptLeft.val());
+                    layoutDiv.css('margin-left', layoutLeft);
+                    ppInpt.ppinptLeft.val(layoutLeft+"px")
                 });
 
                 // left-- position
                 ppOffset.ppRight.click(function () {
-                    var layoutLeft = parseInt(layoutDiv.css('margin-left'));
-                    layoutDiv.css('margin-left', layoutLeft -= 1);
+                    layoutLeft = parseInt(layoutDiv.css('margin-left'));
+                    layoutLeft -= 1;
+                    layoutDiv.css('margin-left', layoutLeft);
+                    ppInpt.ppinptLeft.val(parseInt(layoutLeft)+"px");
                 });
             }
 
@@ -163,26 +191,26 @@
             if (settings.enable) {
                 layoutDiv.mouseenter(function () {
                     var $this = $(this);
-                    if (settings.enable) $this.hide();
+                    $this.hide();
                 });
                 ppNavWrap.ppNav.mouseenter(function () {
-                    if (settings.enable) layoutDiv.show();
+                    layoutDiv.show();
                 });
                 html.mouseleave(function () {
-                    if (settings.enable) layoutDiv.show();
+                    layoutDiv.show();
                 });
             } else layoutDiv.hide();
 
             // #pp-nav position
             switch (settings.navPosition) {
-                case navPos[0]:
+                case navPos[0]:   // 'leftTop' position
                     ppNavWrap.ppNav.css({
                         left: 0,
                         top: 0,
                         right: 'auto'
                     });
                     break
-                case navPos[2]:
+                case navPos[2]:  // 'bottomLeft' position
                     ppNavWrap.ppNav.css({
                         left: 0,
                         right: 'auto',
@@ -190,7 +218,7 @@
                         top: 'auto'
                     });
                     break
-                case navPos[3]:
+                case navPos[3]: // 'bottomRight' position
                     ppNavWrap.ppNav.css({
                         left: 'auto',
                         right: 0,
@@ -198,18 +226,13 @@
                         top: 'auto'
                     });
                     break
-                default:
+                default: // 'topRight' position (default)
                     ppNavWrap.ppNav.css({
                         right: 0,
                         top: 0,
                         left: 'auto'
                     });
             }
-
-
-
-
         });
     };
-
 })(jQuery);

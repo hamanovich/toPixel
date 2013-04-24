@@ -1,5 +1,4 @@
-/* toPixel 1.0.0 css styles  made by Hamanovich Siarhei*/
-
+/* toPixel 1.0.0 css styles  made by Hamanovich Siarhei skype: hamanonvich, icq: 397770745 */
 #pp-layout {
     width:50%;
     position: absolute;
@@ -15,10 +14,10 @@
     font-size: 12px;
     border:1px solid #e7e7e7;
     background-color:#f2f2f2;
-    padding: 10px;
+    padding: 10px 10px 5px;
     margin: 10px;
     line-height: 20px;
-    width: 100px;
+    width: 90px;
     z-index: 9999;
 }
 #pp-nav a {
@@ -41,9 +40,12 @@
     padding: 0;
 }
 #pp-nav input{
-    width:80px;
+    width:100%;
     text-align: center;
-    margin: 5px 0 0;
-    font-size: 12px;
+    margin: 5px 0;
+    font-size: 11px;
     font-family: sans-serif;
+    padding: 0;
+    line-height: 18px;
+    height: 18px;
 }
