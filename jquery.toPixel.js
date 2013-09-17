@@ -304,7 +304,7 @@
                         drg_w = $drag.outerWidth(),
                         pos_y = $drag.offset().top + drg_h - e.pageY,
                         pos_x = $drag.offset().left + drg_w - e.pageX;
-                    
+
                     $drag.css('z-index', 1000).parents().on("mousemove", function(e) {
 
                         ppLeft.val(parseInt($drag.css('left')));
@@ -333,7 +333,7 @@
 
             ppDrag.click(function(){
                 // draggable function
-                if ($(this).attr('checked') == 'checked'){
+                if ($(this).filter(':checked').size() > 0){
                     layoutDiv.addClass('check-drag');
                 } else {
                     layoutDiv.removeClass('check-drag');
