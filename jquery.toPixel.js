@@ -4,6 +4,7 @@
             opacity: 0.5,           // layout opacity  (0 <= opacity <= 1)
             enable: true,           // show/hide layout (true or false)
             imgPath: 'layout.jpg',  // path to img
+            draggable : false,      // draggable default statement (true or false)
             top: 0,                 // layout top offset
             left: 0,                // layout left offset
             navPosition: 'rightTop' //  layout bar position:
@@ -38,6 +39,7 @@
                 "<span>or</span><a href='#' id='pp-bottom'>top--</a>" +
                 "<input type='text' id='ppinpt-top' value='0' placeholder='top pos'></div>" +
                 "</div>" +
+                "<div><label>draggable? <input type='checkbox' id='pp-drag'></label></div>" +
                 "</div>");
 
             var layoutDiv = $('#pp-layout'),
@@ -58,7 +60,8 @@
                     },
                     ppInpt : {
                         ppinptLeft : $('#ppinpt-left'),
-                        ppinptTop : $('#ppinpt-top')
+                        ppinptTop : $('#ppinpt-top'),
+                        ppDrag : $('#pp-drag')
                     }
                 },
                 ppOpacity = ppNavWrap.ppOpacity,
@@ -66,10 +69,11 @@
                 ppInpt = ppNavWrap.ppInpt,
                 ppLeft = ppInpt.ppinptLeft,
                 ppTop = ppInpt.ppinptTop,
+                ppDrag = ppInpt.ppDrag,
                 navPos = ['leftTop', 'rightTop', 'leftBottom', 'rightBottom'],
-                layoutID = $('#layoutImg');
-			
-			var defTopPos = getCookie('top') ? getCookie('top') : settings.top,
+                layoutID = $('#layoutImg'),
+
+                defTopPos = getCookie('top') ? getCookie('top') : settings.top,
 				defLeftPos = getCookie('left') ? getCookie('left') : settings.left,
 				defOpacity = getCookie('opacity') ? getCookie('opacity') : settings.opacity;
 
@@ -124,7 +128,7 @@
                                 'opacity': 1,
                                 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + 100 + ')',
                                 'filter': 'alpha(opacity=' + 100 + ')'
-                            })
+                            });
                         }
                     });
 
@@ -132,6 +136,7 @@
                     ppOpacity.ppLess.click(function () {
                         if (parseFloat(getCookie('opacity')) > 0) {
                             settings.opacity = parseFloat(getCookie('opacity')) - 0.1;
+
                             layoutDiv.css({
                                 'opacity': settings.opacity,
                                 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + settings.opacity * 100 + ')',
@@ -143,7 +148,7 @@
                                 'opacity': settings.opacity,
                                 'filter': 'progid:DXImageTransform.Microsoft.Alpha(opacity=' + settings.opacity * 100 + ')',
                                 'filter': 'alpha(opacity=' + settings.opacity * 100 + ')'
-                            })
+                            });
                         }
                     });
 
@@ -151,7 +156,7 @@
                     ppTop.val(defTopPos);
 
                     ppOffset.ppTop.click(function () {
-                        valTop =  parseInt(ppInpt.ppinptTop.val());
+                        valTop =  parseInt(layoutDiv.css('top'));
                         valTop += 1;
                         layoutDiv.css('top', valTop);
                         ppInpt.ppinptTop.val(valTop);
@@ -164,12 +169,12 @@
                         else valTop = 0;
 
                         layoutDiv.css('top', valTop);
-                        ppInpt.ppinptTop.val(valTop)
+                        ppInpt.ppinptTop.val(valTop);
                     });
 
                     // top-- position
                     ppOffset.ppBottom.click(function () {
-                        valTop =  parseInt(ppInpt.ppinptTop.val());
+                        valTop =  parseInt(layoutDiv.css('top'));
                         valTop -= 1;
                         layoutDiv.css('top', valTop);
                         ppInpt.ppinptTop.val(valTop);
@@ -193,7 +198,7 @@
                         else layoutLeft = 0;
 
                         layoutDiv.css('left', layoutLeft);
-                        ppInpt.ppinptLeft.val(layoutLeft)
+                        ppInpt.ppinptLeft.val(layoutLeft);
                     });
 
                     // left-- position
@@ -210,7 +215,8 @@
                 if (settings.enable) {
                     layoutDiv.mouseenter(function () {
                         var $this = $(this);
-                        $this.hide();
+                        if (!$this.hasClass('check-drag'))
+                            $this.hide();
                     });
                     ppNavWrap.ppNav.mouseenter(function () {
                         layoutDiv.show();
@@ -269,13 +275,78 @@
                 document.cookie = 'left=' + encodeURIComponent(ppLeft.val()) + '; max-age=' + (24*60*60);
                 document.cookie = 'top=' + encodeURIComponent(ppTop.val()) + '; max-age=' + (24*60*60);
                 document.cookie = 'opacity=' + encodeURIComponent(parseFloat(settings.opacity.toFixed(1) + 0.1)) + '; max-age=' + (24*60*60);
-            }
+            };
 
-            function getCookie(name) { // get cookie function
+           function getCookie(name) { // get cookie function
                 var matches = document.cookie.match(new RegExp(
                     "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
                 ));
                 return matches ? decodeURIComponent(matches[1]) : undefined;
+            };
+
+            $.fn.drags = function(opt) {
+                opt = $.extend({handle:"",cursor:"move"}, opt);
+
+                if(opt.handle === "") {
+                    var $el = this;
+                } else {
+                    var $el = this.find(opt.handle);
+                }
+
+                return $el.css('cursor', opt.cursor).on("mousedown", function(e) {
+                    if(opt.handle === "") {
+                        var $drag = $(this).addClass('draggable');
+                    } else {
+                        var $drag = $(this).addClass('active-handle').parent().addClass('draggable');
+                    }
+                    var z_idx = $drag.css('z-index'),
+                        drg_h = $drag.outerHeight(),
+                        drg_w = $drag.outerWidth(),
+                        pos_y = $drag.offset().top + drg_h - e.pageY,
+                        pos_x = $drag.offset().left + drg_w - e.pageX;
+                    
+                    $drag.css('z-index', 1000).parents().on("mousemove", function(e) {
+
+                        ppLeft.val(parseInt($drag.css('left')));
+                        ppTop.val(parseInt($drag.css('top')));
+
+                        $('.draggable').offset({
+                            top:e.pageY + pos_y - drg_h,
+                            left:e.pageX + pos_x - drg_w
+                        }).on("mouseup", function() {
+                                $(this).removeClass('draggable').css('z-index', z_idx);
+                            });
+                    });
+
+                    e.preventDefault(); // disable selection
+                }).on("mouseup", function() {
+                        if(opt.handle === "") {
+                            $(this).removeClass('draggable');
+                        } else {
+                            $(this).removeClass('active-handle').parent().removeClass('draggable');
+                        }
+
+                        setCookie();
+                    });
+
+            };
+
+            ppDrag.click(function(){
+                // draggable function
+                if ($(this).attr('checked') == 'checked'){
+                    layoutDiv.addClass('check-drag');
+                } else {
+                    layoutDiv.removeClass('check-drag');
+                }
+
+                layoutDiv.drags(); // launch draggable
+
+            });
+
+            if (settings.draggable){
+                layoutDiv.addClass('check-drag');
+                ppDrag.attr('checked', 'checked');
+                layoutDiv.drags();
             }
 
             // css styles in js
@@ -319,7 +390,7 @@
                 'display' : 'block',
                 'font-weight' : 'bold'
             });
-            ppNavWrap.ppNav.find('input').css({
+            ppNavWrap.ppNav.find('input[type="text"]').css({
                 'width' : '100%',
                 'text-align' : 'center',
                 'margin' : '5px 0',
@@ -330,6 +401,11 @@
                 'line-height' : '18px',
                 'height' : '18px',
                 'background-color' : '#fff'
+            });
+            ppNavWrap.ppNav.find('input[type="checkbox"]').css({
+                'vertical-align' : 'middle',
+                'position' : 'relative',
+                'top' : -1
             });
 
         });
