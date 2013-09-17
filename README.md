@@ -8,9 +8,10 @@ It's a tiny jquery plugin, that helps you to compare your html page with mockup.
 Just include this script after jQuery. Requires jQuery 1.4+.
 ``` html
 <script src='jquery.js'></script>
-<script src='jquery.toPixel.js'></script>
+<script src='toPixel/jquery.toPixel.js'></script>
 ```
 Of course omit the first line if you already have jQuery included.
+jquery.toPixel.js must be into toPixel folder.
 
 After that, you need to write this code (or put at the end of your custom jquery code):
 ``` javascript
