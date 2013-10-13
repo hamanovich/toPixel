@@ -101,7 +101,7 @@
                 if (settings.enable) {   // if layout switch on
 
                     // switch on/off function
-                    ppNavWrap.ppToggle.click(function (e) {
+                    ppNavWrap.ppToggle.on('click', function (e) {
                         if (settings.enable) {
                             settings.enable = false;
                             layoutDiv.hide();
@@ -114,7 +114,7 @@
                     });
 
                     // more opacity
-                    ppOpacity.ppMore.click(function () {
+                    ppOpacity.ppMore.on('click', function () {
                         if (parseFloat(getCookie('opacity')) < 1) {
                             settings.opacity = parseFloat(getCookie('opacity')) + 0.1;
                             layoutDiv.css({
@@ -133,7 +133,7 @@
                     });
 
                     // less opacity
-                    ppOpacity.ppLess.click(function () {
+                    ppOpacity.ppLess.on('click', function () {
                         if (parseFloat(getCookie('opacity')) > 0) {
                             settings.opacity = parseFloat(getCookie('opacity')) - 0.1;
 
@@ -155,7 +155,7 @@
                     // top++ position
                     ppTop.val(defTopPos);
 
-                    ppOffset.ppTop.click(function () {
+                    ppOffset.ppTop.on('click', function () {
                         valTop =  parseInt(layoutDiv.css('top'));
                         valTop += 1;
                         layoutDiv.css('top', valTop);
@@ -163,7 +163,7 @@
                     });
 
                     // top blur input
-                    ppInpt.ppinptTop.change(function(){
+                    ppInpt.ppinptTop.on('change', function(){
                         if (ppInpt.ppinptTop.val() !== '' && ppInpt.ppinptTop)
                             valTop =  parseInt(ppInpt.ppinptTop.val());
                         else valTop = 0;
@@ -173,7 +173,7 @@
                     });
 
                     // top-- position
-                    ppOffset.ppBottom.click(function () {
+                    ppOffset.ppBottom.on('click', function () {
                         valTop =  parseInt(layoutDiv.css('top'));
                         valTop -= 1;
                         layoutDiv.css('top', valTop);
@@ -184,7 +184,7 @@
 
                     ppLeft.val(defLeftPos);
 
-                    ppOffset.ppLeft.click(function () {
+                    ppOffset.ppLeft.on('click', function () {
                         layoutLeft = parseInt(layoutDiv.css('left'));
                         layoutLeft += 1;
                         layoutDiv.css('left', layoutLeft);
@@ -192,7 +192,7 @@
                     });
 
                     // ppLeft blur input
-                    ppInpt.ppinptLeft.change(function(){
+                    ppInpt.ppinptLeft.on('change', function(){
                         if (ppInpt.ppinptLeft.val() !== '' && ppInpt.ppinptLeft)
                             layoutLeft =  parseInt(ppInpt.ppinptLeft.val());
                         else layoutLeft = 0;
@@ -213,16 +213,18 @@
 
                 // #pp-layout show toggle
                 if (settings.enable) {
-                    layoutDiv.mouseenter(function () {
+                    layoutDiv.on('mouseenter', function () {
                         var $this = $(this);
                         if (!$this.hasClass('check-drag'))
                             $this.hide();
                     });
-                    ppNavWrap.ppNav.mouseenter(function () {
-                        layoutDiv.show();
+                    ppNavWrap.ppNav.on('mouseenter', function () {
+                         if (settings.enable)
+                             layoutDiv.show();
                     });
-                    html.mouseleave(function () {
-                        layoutDiv.show();
+                    html.on('mouseleave', function () {
+                        if (settings.enable)
+                            layoutDiv.show();
                     });
                 } else layoutDiv.hide();
 
@@ -260,14 +262,14 @@
                 };
 
                 //get and set Cookies
-                ppOpacity.ppMore.click(setCookie);
-                ppOpacity.ppLess.click(setCookie);
-                ppLeft.change(setCookie);
-                ppTop.change(setCookie);
-                ppOffset.ppLeft.click(setCookie);
-                ppOffset.ppRight.click(setCookie);
-                ppOffset.ppTop.click(setCookie);
-                ppOffset.ppBottom.click(setCookie);
+                ppOpacity.ppMore.on('click', setCookie);
+                ppOpacity.ppLess.on('click', setCookie);
+                ppLeft.on('change', setCookie);
+                ppTop.on('change', setCookie);
+                ppOffset.ppLeft.on('click', setCookie);
+                ppOffset.ppRight.on('click', setCookie);
+                ppOffset.ppTop.on('click', setCookie);
+                ppOffset.ppBottom.on('click', setCookie);
             });
 
             // cookie functions
@@ -331,7 +333,7 @@
 
             };
 
-            ppDrag.click(function(){
+            ppDrag.on('click', function(){
                 // draggable function
                 if ($(this).filter(':checked').size() > 0){
                     layoutDiv.addClass('check-drag');
