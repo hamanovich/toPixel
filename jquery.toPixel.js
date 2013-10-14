@@ -80,7 +80,6 @@
             win.load(function(){   // after load document
                 // #pp-layout insert and make style
                 layoutDiv.prepend(layoutImg);
-                $('#ppinpt-left').val(300);
 
                 // apply default css styles
                 layoutDiv.css({
@@ -208,7 +207,7 @@
                         layoutDiv.css('left', layoutLeft);
                         ppInpt.ppinptLeft.val(parseInt(layoutLeft));
                     });
-					
+
                 }  else ppNavWrap.ppNav.hide(); // hide navbar
 
                 // #pp-layout show toggle
@@ -322,14 +321,14 @@
 
                     e.preventDefault(); // disable selection
                 }).on("mouseup", function() {
-                        if(opt.handle === "") {
-                            $(this).removeClass('draggable');
-                        } else {
-                            $(this).removeClass('active-handle').parent().removeClass('draggable');
-                        }
+                    if(opt.handle === "") {
+                        $(this).removeClass('draggable');
+                    } else {
+                        $(this).removeClass('active-handle').parent().removeClass('draggable');
+                    }
 
-                        setCookie();
-                    });
+                    setCookie();
+                });
 
             };
 
@@ -349,7 +348,39 @@
                 layoutDiv.addClass('check-drag');
                 ppDrag.attr('checked', 'checked');
                 layoutDiv.drags();
-            }
+            };
+
+            // keyboard navigation
+            win.on('keydown', function (e) {
+                var code = e.keyCode;
+                if (code === 37) {
+                    ppInpt.ppinptLeft.val(+ppInpt.ppinptLeft.val()-1);
+                    layoutDiv.css('left', +ppInpt.ppinptLeft.val()-1);
+                    setCookie();
+                } else if (code === 38) {
+                    ppInpt.ppinptTop.val(+ppInpt.ppinptTop.val()+1);
+                    layoutDiv.css('top', +ppInpt.ppinptTop.val()+1);
+                    setCookie();
+                } else if (code === 39) {
+                    ppInpt.ppinptLeft.val(+ppInpt.ppinptLeft.val()+1);
+                    layoutDiv.css('left', +ppInpt.ppinptLeft.val()+1);
+                    setCookie();
+                } else if (code === 40 || ( code === 40 && e.shiftKey) ) {
+                    ppInpt.ppinptTop.val(+ppInpt.ppinptTop.val()-1);
+                    layoutDiv.css('top', +ppInpt.ppinptTop.val()-1);
+                    setCookie();
+                } else if ( code === 69 && e.shiftKey ) {
+                    if (settings.enable) {
+                        settings.enable = false;
+                        layoutDiv.hide();
+                        ppNavWrap.ppToggle.text('switch on');
+                    } else {
+                        settings.enable = true;
+                        layoutDiv.show();
+                        ppNavWrap.ppToggle.text('switch off');
+                    }
+                }
+            });
 
             // css styles in js
             ppNavWrap.ppNav.css({
