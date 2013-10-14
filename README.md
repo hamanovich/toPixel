@@ -38,3 +38,6 @@ You can use plugin with default options, e.g.:
 ```
 
 Layout image must be into the folder with jquery.toPixel plugin.
+
+You can navigate and position using keyboard. left++, right++, top++ and down++ (you should pressed ctrl+arrow down instead of arrow down).
+And also, right now if pressed SHIFT + E will toggle enable/disable state.
